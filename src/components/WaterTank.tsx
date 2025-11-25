@@ -30,6 +30,8 @@ export const WaterTank = ({ level, turbidity, label }: WaterTankProps) => {
   const hasTurbiditySensor = turbidity !== undefined;
   const waterColor = hasTurbiditySensor ? getWaterColor(turbidity) : "hsl(var(--water-clean))";
   
+  const isLowLevel = level < 35;
+  
   return (
     <div className="flex flex-col items-center gap-4 min-w-[140px]">
       <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
@@ -37,6 +39,25 @@ export const WaterTank = ({ level, turbidity, label }: WaterTankProps) => {
       </span>
 
       <div className="relative w-32 h-64 rounded-2xl bg-card/50 backdrop-blur-sm border-2 border-border shadow-xl overflow-hidden">
+        {/* LED de advertencia - nivel bajo */}
+        <motion.div
+          className="absolute top-3 right-3 w-4 h-4 rounded-full z-10"
+          style={{
+            backgroundColor: isLowLevel ? '#ef4444' : '#22c55e',
+            boxShadow: isLowLevel 
+              ? '0 0 10px #ef4444, 0 0 20px #ef444480' 
+              : '0 0 8px #22c55e80',
+          }}
+          animate={{
+            opacity: isLowLevel ? [1, 0.4, 1] : 1,
+            scale: isLowLevel ? [1, 1.1, 1] : 1,
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: isLowLevel ? Infinity : 0,
+            ease: "easeInOut"
+          }}
+        />
         {/* Grid de fondo para efecto técnico */}
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full" style={{
