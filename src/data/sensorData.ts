@@ -6,6 +6,7 @@ export interface SensorData {
   tank2Level: number; // 0-100%
   tank3Level: number; // 0-100%
   tank3Turbidity: number; // 0-900
+  tank3Temperature: number; // Temperatura en °C
 }
 
 // Simular datos dinámicos
@@ -16,6 +17,7 @@ let currentData: SensorData = {
   tank2Level: 78,
   tank3Level: 62,
   tank3Turbidity: 250,
+  tank3Temperature: 22.5,
 };
 
 // Simular cambios aleatorios cada ciertos segundos
@@ -35,6 +37,9 @@ export const getSimulatedData = (): SensorData => {
 
   // Cambios graduales en turbidez
   currentData.tank3Turbidity = Math.max(0, Math.min(900, currentData.tank3Turbidity + (Math.random() - 0.5) * 40));
+
+  // Cambios graduales en temperatura (15°C - 35°C)
+  currentData.tank3Temperature = Math.max(15, Math.min(35, currentData.tank3Temperature + (Math.random() - 0.5) * 0.8));
 
   return { ...currentData };
 };

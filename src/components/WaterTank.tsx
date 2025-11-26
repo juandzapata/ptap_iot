@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Droplets } from "lucide-react";
+import { Droplets, Thermometer } from "lucide-react";
 
 interface WaterTankProps {
   level: number; // 0-100
   turbidity?: number; // 0-900 (solo para tanque 3)
+  temperature?: number; // Temperatura en °C
   label: string;
 }
 
@@ -26,9 +27,33 @@ const getWaterColor = (turbidity: number) => {
   }
 };
 
-export const WaterTank = ({ level, turbidity, label }: WaterTankProps) => {
+// Calcular color de temperatura (15°C - 35°C)
+const getTemperatureColor = (temp: number) => {
+  // 15-20: azul (frío)
+  // 20-25: verde (templado)
+  // 25-30: amarillo-naranja (cálido)
+  // 30-35: rojo (caliente)
+  
+  if (temp <= 20) {
+    const progress = (temp - 15) / 5;
+    return `hsl(${200 - progress * 20}, 85%, 55%)`;
+  } else if (temp <= 25) {
+    const progress = (temp - 20) / 5;
+    return `hsl(${180 - progress * 60}, 75%, 50%)`;
+  } else if (temp <= 30) {
+    const progress = (temp - 25) / 5;
+    return `hsl(${120 - progress * 90}, 80%, 55%)`;
+  } else {
+    const progress = Math.min(1, (temp - 30) / 5);
+    return `hsl(${30 - progress * 30}, 85%, 50%)`;
+  }
+};
+
+export const WaterTank = ({ level, turbidity, temperature, label }: WaterTankProps) => {
   const hasTurbiditySensor = turbidity !== undefined;
+  const hasTemperatureSensor = temperature !== undefined;
   const waterColor = hasTurbiditySensor ? getWaterColor(turbidity) : "hsl(var(--water-clean))";
+  const tempColor = hasTemperatureSensor ? getTemperatureColor(temperature) : "";
   
   const isLowLevel = level < 35;
   
@@ -129,6 +154,44 @@ export const WaterTank = ({ level, turbidity, label }: WaterTankProps) => {
             <span className="text-xs font-bold" style={{ color: waterColor }}>
               {Math.round(turbidity)}
             </span>
+          </div>
+        )}
+
+        {hasTemperatureSensor && (
+          <div className="relative flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-lg px-3 py-2 border border-border overflow-hidden">
+            {/* Fondo animado según temperatura */}
+            <motion.div
+              className="absolute inset-0 opacity-20"
+              style={{ backgroundColor: tempColor }}
+              animate={{ opacity: [0.15, 0.25, 0.15] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+            
+            {/* Icono termómetro animado */}
+            <motion.div
+              animate={{ 
+                scale: temperature && temperature > 28 ? [1, 1.1, 1] : 1,
+              }}
+              transition={{ duration: 2, repeat: temperature && temperature > 28 ? Infinity : 0 }}
+            >
+              <Thermometer className="w-4 h-4 z-10 relative" style={{ color: tempColor }} />
+            </motion.div>
+            
+            <span className="text-xs font-medium z-10 relative">Temperatura</span>
+            
+            {/* Display temperatura con gradiente */}
+            <motion.span 
+              className="text-xs font-bold z-10 relative"
+              style={{ color: tempColor }}
+              animate={{ 
+                textShadow: temperature && temperature > 28 
+                  ? [`0 0 5px ${tempColor}`, `0 0 10px ${tempColor}`, `0 0 5px ${tempColor}`]
+                  : "none"
+              }}
+              transition={{ duration: 2, repeat: temperature && temperature > 28 ? Infinity : 0 }}
+            >
+              {temperature?.toFixed(1)}°C
+            </motion.span>
           </div>
         )}
       </div>
