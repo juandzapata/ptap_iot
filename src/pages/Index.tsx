@@ -112,11 +112,12 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.0 }}
             >
-              <WaterTank 
-                level={data.tank3Level} 
-                turbidity={data.tank3Turbidity}
-                label="Tanque 3"
-              />
+            <WaterTank 
+              level={data.tank3Level} 
+              turbidity={data.tank3Turbidity}
+              temperature={data.tank3Temperature}
+              label="Tanque 3"
+            />
             </motion.div>
 
             {/* Tubería conectora 4 */}
